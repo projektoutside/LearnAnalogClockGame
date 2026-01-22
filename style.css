@@ -773,13 +773,21 @@ body {
     }
 
     #options {
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-xs);
+        grid-template-columns: repeat(4, 1fr) !important;
+        /* 4 in a row */
+        gap: var(--spacing-sm);
+        width: 100%;
     }
 
     .option {
-        min-height: 44px;
-        font-size: 1.1rem;
+        min-height: auto;
+        aspect-ratio: 1/1;
+        /* Force perfect squares */
+        font-size: 1rem;
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
