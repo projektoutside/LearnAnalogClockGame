@@ -684,6 +684,39 @@ body {
     pointer-events: none;
 }
 
+.shop-close-btn {
+    grid-column: 1 / -1;
+    /* Span full width in grid */
+    width: 100%;
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    min-height: 50px;
+    /* Ensure 44px+ touch target */
+}
+
+.shop-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.shop-close-btn:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.05);
+}
+
 #purchase-feedback {
     position: fixed;
     bottom: calc(var(--space-xl) + var(--safe-bottom));

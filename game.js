@@ -3671,6 +3671,23 @@ class RewardShop {
         });
 
         GameUtils.log(`📱 Enhanced shop event listeners set up for ${shopItems.length} items`);
+
+        // Close Shop Button Listener
+        const closeShopBtn = document.getElementById('close-shop-btn');
+        if (closeShopBtn) {
+            closeShopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent bubbling
+                this.toggleMobileShop(); // Re-use toggle logic which handles animation/state/timer
+            });
+
+            // Touch support
+            closeShopBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleMobileShop();
+            });
+        }
     }
 
     setupMobileToggle() {
