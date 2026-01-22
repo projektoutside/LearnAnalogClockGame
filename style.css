@@ -23,14 +23,16 @@
     --backdrop-blur: 12px;
 
     /* Spacing & Sizing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    /* Spacing & Sizing - Scaled Down slightly */
+    --spacing-xs: 0.2rem;
+    --spacing-sm: 0.4rem;
+    --spacing-md: 0.8rem;
+    --spacing-lg: 1.2rem;
+    --spacing-xl: 1.5rem;
 
     /* Layout */
-    --clock-size: min(45vh, 45vw);
+    --clock-size: min(40vh, 40vw);
+    /* Reduced from 45 for better fit */
 
     /* Global Radius */
     --radius-sm: 8px;
@@ -439,6 +441,12 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .header-icon-btn {
     width: 40px;
     height: 40px;
@@ -603,9 +611,9 @@ body {
     .clock-container {
         /* Intelligently size clock based on available viewport height for controls */
         /* Reserve ~60% height for controls/header, rest for clock */
-        max-height: 35vh;
-        /* Reduced to be safer */
-        max-width: 80%;
+        max-height: 30vh;
+        /* Reduced from 35vh for extra safety */
+        max-width: 70%;
         width: auto;
         margin: 0 auto;
     }
@@ -687,30 +695,34 @@ body {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         /* STRICTLY 2x2 */
-        gap: 8px;
-        /* Slightly more gap for box separation */
+        gap: 6px;
+        /* Reduced gap */
         width: 100%;
-        max-width: 400px;
+        max-width: 380px;
+        /* Reduced width */
         margin: 0 auto;
     }
 
     .option {
         height: auto;
         /* Allow flex sizing */
-        min-height: 55px;
+        min-height: 50px;
+        /* Reduced from 55px */
         /* Minimum accessible size */
         flex: 1;
         /* Stretch to fill grid cell */
-        aspect-ratio: 2/1;
+        aspect-ratio: 2.2/1;
+        /* Slightly flatter */
         /* Try to maintain boxy shape */
         padding: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        /* Reduced font */
         width: 100%;
         /* Ensure distinct box look */
-        border-radius: 16px;
+        border-radius: 12px;
     }
 
     #reward-shop-panel {
@@ -744,7 +756,11 @@ body {
     }
 
     .clock-container {
-        max-width: 80vh;
+        max-width: 55vh;
+        /* Significantly reduced to prevent vertical crowding */
+        margin: 0;
+        /* Auto margin can cause issues in tight grids */
+        justify-self: center;
     }
 
     #question-panel h1 {
