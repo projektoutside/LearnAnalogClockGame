@@ -1949,7 +1949,8 @@ class PerfectGameLogic {
 
         this.updateAllDisplays();
         this.generateQuestion();
-        this.startTimer();
+        // Initialize the global timer for the new game
+        this.startTimer(true);
         this.domManager.updateClockStatusWithLevel(this.gameState);
 
         GameUtils.log(`Game started successfully at level ${startingLevel} - question should be generated`);
@@ -2911,10 +2912,23 @@ class PerfectGameLogic {
         }
     }
 
-    startTimer() {
-        const level = this.gameState.getCurrentLevel();
-        this.gameState.timeRemaining = level.timeLimit;
+    startTimer(isNewGame = false) {
+        // Only set initial time if it's a new game (or restart)
+        if (isNewGame) {
+            // Use global time limit from settings (in minutes) converted to seconds
+            // Default to 5 minutes if settings not available
+            const timeInMinutes = this.gameState.settingsManager ?
+                this.gameState.settingsManager.getSetting('timeMultiplier') : 5;
+            this.gameState.timeRemaining = timeInMinutes * 60;
+            GameUtils.log(`Global timer initialized: ${timeInMinutes} minutes (${this.gameState.timeRemaining}s)`);
+        }
+
         this.updateTimerDisplay();
+
+        // Clear any existing timer to avoid duplicates
+        if (this.gameState.timer) {
+            clearInterval(this.gameState.timer);
+        }
 
         this.gameState.timer = setInterval(() => {
             this.gameState.timeRemaining--;
@@ -3248,8 +3262,8 @@ class LevelTransitionManager {
             this.gameLogic.isProcessingAnswer = false;
             this.gameLogic.answerProcessingStartTime = null;
 
-            // Start timer for the new level
-            this.gameLogic.startTimer();
+            // Resume the global timer (do NOT reset it)
+            this.gameLogic.resumeTimer();
 
             // Generate new question for the new level
             setTimeout(() => {
