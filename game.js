@@ -1213,7 +1213,7 @@ class DOMManager {
     }
 
     // Mobile debug and emergency fallback system
-    showGameOverModal(stats, leaderboard, onPlayAgain, onMenu) {
+    showGameOverModal(stats, leaderboard, onPlayAgain, onMenu, onPurchaseTime) {
         GameUtils.log('Trying to show Game Over Modal...');
         try {
             const modal = this.get('gameOverModal');
@@ -1252,6 +1252,7 @@ class DOMManager {
             const scoreEl = this.get('finalScore');
             const accuracyEl = this.get('finalAccuracy');
             const questionsEl = this.get('finalQuestions');
+            const coinsEl = document.getElementById('final-coins'); // Get via ID directly if not cached
 
             GameUtils.log(`Updating stats: Score=${stats.score}, Accuracy=${stats.accuracy}`);
 
@@ -1260,6 +1261,45 @@ class DOMManager {
                 accuracyEl.textContent = (stats.accuracy || 0) + '%';
             }
             if (questionsEl) questionsEl.textContent = stats.questions || 0;
+            if (coinsEl) coinsEl.textContent = (stats.coins || 0) + ' 🪙';
+
+            // Setup Last Chance Shop
+            const buyTimeBtn = document.getElementById('buy-time-btn');
+            const shopFeedback = document.getElementById('shop-feedback');
+            const lastChanceSection = document.getElementById('last-chance-shop');
+
+            // Only show if user has enough coins (or maybe show disabled?)
+            // Let's show it always but disable if poor
+
+            if (buyTimeBtn && lastChanceSection) {
+                // Check if Time Up or just Lost Life?
+                // User requested "when the timer is up". If stats.score is valid, assume it's game over.
+                // We can check if coins >= 10 to enable button
+                const canAfford = (stats.coins || 0) >= 10;
+                buyTimeBtn.disabled = !canAfford;
+
+                // Clear old listeners
+                const newBuyBtn = buyTimeBtn.cloneNode(true);
+                buyTimeBtn.parentNode.replaceChild(newBuyBtn, buyTimeBtn);
+
+                newBuyBtn.addEventListener('click', () => {
+                    if (onPurchaseTime) {
+                        const success = onPurchaseTime(10);
+                        if (success) {
+                            // Feedback shown by logic or just animate
+                            if (shopFeedback) {
+                                shopFeedback.textContent = 'Time Purchased! Resuming...';
+                                shopFeedback.className = 'shop-feedback success';
+                            }
+                        } else {
+                            if (shopFeedback) {
+                                shopFeedback.textContent = 'Not enough coins!';
+                                shopFeedback.className = 'shop-feedback error';
+                            }
+                        }
+                    }
+                });
+            }
 
             // Populate Leaderboard
             const listEl = this.get('leaderboardList');
@@ -1286,12 +1326,12 @@ class DOMManager {
                     const dateDisplay = entry.date || '-';
 
                     item.innerHTML = `
-                        <div style="display: flex; align-items: center;">
-                            <span class="leaderboard-rank rank-${index + 1}">${index + 1}</span>
-                            <span class="leaderboard-date">${dateDisplay}</span>
-                        </div>
-                        <span class="leaderboard-score">${scoreDisplay}</span>
-                    `;
+                    <div style="display: flex; align-items: center;">
+                        <span class="leaderboard-rank rank-${index + 1}">${index + 1}</span>
+                        <span class="leaderboard-date">${dateDisplay}</span>
+                    </div>
+                    <span class="leaderboard-score">${scoreDisplay}</span>
+                `;
                     listEl.appendChild(item);
                 });
             } else {
@@ -1330,7 +1370,7 @@ class DOMManager {
             }
 
         } catch (error) {
-            GameUtils.error('Error showing Game Over Modal:', error);
+            GameUtils.error('Error showing Game Over modal:', error);
             // Fallback: If modal fails, use alert or simple log so user isn't stuck
             alert(`Game Over! Score: ${stats.score}`);
             if (onMenu) onMenu();
@@ -2989,7 +3029,8 @@ class PerfectGameLogic {
         const stats = {
             score: this.gameState.points,
             accuracy: accuracy,
-            questions: this.gameState.questionsAnswered
+            questions: this.gameState.questionsAnswered,
+            coins: this.rewardShop ? this.rewardShop.getClockCoins() : 0
         };
 
         const leaderboard = this.highScoreManager ? this.highScoreManager.getLeaderboard() : [];
@@ -2999,7 +3040,18 @@ class PerfectGameLogic {
             stats,
             leaderboard,
             () => this.restartGame(),     // Play Again Callback
-            () => this.returnToMenu()     // Menu Callback
+            () => this.returnToMenu(),    // Menu Callback
+            // On Purchase Time Callback
+            (cost) => {
+                if (this.rewardShop && this.rewardShop.getClockCoins() >= cost) {
+                    this.rewardShop.clockCoins -= cost;
+                    this.rewardShop.updateClockCoinDisplay();
+                    this.gameState.addTime(60); // Add 60 seconds
+                    this.resumeGameFromGameOver();
+                    return true; // Success
+                }
+                return false; // Failed
+            }
         );
 
         // Update status for background context (optional)
@@ -3010,6 +3062,19 @@ class PerfectGameLogic {
         GameUtils.log(`🎮 Game Over - Score: ${this.gameState.points}, Accuracy: ${accuracy}%`);
     }
 
+    resumeGameFromGameOver() {
+        GameUtils.log('Resuming game from Last Chance shop purchase...');
+        this.gameState.isGameActive = true;
+
+        // Hide modal
+        const modal = this.domManager.get('gameOverModal');
+        if (modal) modal.classList.add('hidden');
+
+        // Resume global timer (don't reset)
+        this.resumeTimer();
+
+        this.domManager.updateClockStatus('Game Resumed! +1 Minute Added ⏰');
+    }
     restartGame() {
         // Restart immediately with the same initial level
         GameUtils.log(`Restarting game at level ${this.initialLevel}...`);

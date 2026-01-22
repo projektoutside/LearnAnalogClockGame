@@ -1812,3 +1812,120 @@ button:focus-visible {
         border-radius: 0;
     }
 }
+
+/* =============================================
+   LAST CHANCE SHOP (GAME OVER)
+   ============================================= */
+.last-chance-section {
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.4), rgba(49, 27, 146, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    margin: var(--space-md) 0;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.last-chance-section h3 {
+    color: var(--color-warning);
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-lg);
+    text-shadow: 0 0 10px rgba(255, 183, 77, 0.3);
+}
+
+.last-chance-section p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+/* Shop Item Button - Premium Look */
+.shop-item-btn {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--color-bg-light), var(--color-bg-mid));
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-item-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--color-warning);
+    box-shadow: 0 8px 20px rgba(255, 183, 77, 0.25);
+    background: linear-gradient(135deg, rgba(255, 160, 0, 0.1), rgba(255, 111, 0, 0.05));
+}
+
+.shop-item-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.shop-item-btn .btn-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.shop-item-btn .btn-icon {
+    font-size: var(--text-xl);
+}
+
+.shop-item-btn .btn-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.shop-item-btn .btn-title {
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--color-text-main);
+}
+
+.shop-item-btn .btn-cost {
+    font-size: var(--text-sm);
+    color: var(--color-warning);
+    font-weight: 600;
+}
+
+/* Shop Feedback */
+.shop-feedback {
+    min-height: 24px;
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.shop-feedback.success {
+    color: var(--color-success);
+    opacity: 1;
+}
+
+.shop-feedback.error {
+    color: #ff5252;
+    opacity: 1;
+}
+
+/* Coin Balance in Stats */
+.stat-box.coin-balance {
+    background: linear-gradient(135deg, rgba(255, 160, 0, 0.1), rgba(255, 111, 0, 0.05));
+    border-color: rgba(255, 160, 0, 0.3);
+}
+
+.stat-box.coin-balance .stat-value {
+    color: #FFA000;
+}
