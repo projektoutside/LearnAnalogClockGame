@@ -2999,9 +2999,10 @@ class PerfectGameLogic {
    SETTINGS MODAL MANAGER
    ============================================= */
 class SettingsModalManager {
-    constructor(domManager, settingsManager) {
+    constructor(domManager, settingsManager, gameLogic) {
         this.domManager = domManager;
         this.settingsManager = settingsManager;
+        this.gameLogic = gameLogic;
         this.setupEventListeners();
         this.updateDisplay();
     }
@@ -3136,12 +3137,18 @@ class SettingsModalManager {
     }
 
     showSettings() {
+        if (this.gameLogic) {
+            this.gameLogic.pauseTimer();
+        }
         this.updateDisplay();
         this.domManager.showSettingsModal();
     }
 
     hideSettings() {
         this.domManager.hideSettingsModal();
+        if (this.gameLogic) {
+            this.gameLogic.resumeTimer();
+        }
     }
 }
 
@@ -3194,6 +3201,11 @@ class LevelTransitionManager {
         this.domManager.showLevelTransitionModal();
 
         GameUtils.log(`Showing level transition from ${currentLevel.id} to ${nextLevel.id}`);
+
+        // Pause timer while in transition
+        if (this.gameLogic) {
+            this.gameLogic.pauseTimer();
+        }
     }
 
     startNextLevel() {
@@ -3205,6 +3217,9 @@ class LevelTransitionManager {
             // ✨ UNLOCK: Reset processing state before generating new question
             this.gameLogic.isProcessingAnswer = false;
             this.gameLogic.answerProcessingStartTime = null;
+
+            // Start timer for the new level
+            this.gameLogic.startTimer();
 
             // Generate new question for the new level
             setTimeout(() => {
@@ -3726,6 +3741,15 @@ class RewardShop {
 
         // Update ARIA label
         mobileToggle.setAttribute('aria-label', newState ? 'Close Reward Shop' : 'Open Reward Shop');
+
+        // Pause/Resume timer based on shop state
+        if (this.gameLogic) {
+            if (newState) {
+                this.gameLogic.pauseTimer();
+            } else {
+                this.gameLogic.resumeTimer();
+            }
+        }
 
         // Add visual feedback for mobile interaction
         if (newState) {
@@ -4333,7 +4357,7 @@ class AnalogClockGame {
         this.gameLogic = new PerfectGameLogic(this.gameState, this.domManager, this.clockBuilder, this.soundManager);
         this.rewardShop = new RewardShop(this.gameState, this.domManager, this.gameLogic);
         this.levelTransitionManager = new LevelTransitionManager(this.domManager, this.gameLogic);
-        this.settingsModalManager = new SettingsModalManager(this.domManager, this.settingsManager);
+        this.settingsModalManager = new SettingsModalManager(this.domManager, this.settingsManager, this.gameLogic);
         this.startMenuManager = new StartMenuManager(this.domManager, this.gameLogic, this.settingsModalManager);
         this.highScoreManager = new HighScoreManager();
 
