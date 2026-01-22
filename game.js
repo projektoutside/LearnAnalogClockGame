@@ -4371,6 +4371,9 @@ class AnalogClockGame {
 
             this.setupInitialState();
 
+            // Initialize Fullscreen Toggle
+            this.setupFullScreenToggle();
+
             // Test clock hands if in debug mode
             if (GAME_CONFIG.DEBUG) {
                 this.testClockFunctionality();
@@ -4444,6 +4447,39 @@ class AnalogClockGame {
             GameUtils.error('Clock builder not available for Level 7 validation');
             return false;
         }
+    }
+
+    setupFullScreenToggle() {
+        const toggleBtn = document.getElementById('fullscreen-toggle');
+        if (!toggleBtn) return;
+
+        toggleBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                // Enter fullscreen
+                document.documentElement.requestFullscreen().catch(err => {
+                    GameUtils.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Update icon based on state
+        document.addEventListener('fullscreenchange', () => {
+            const icon = toggleBtn.querySelector('.icon');
+            if (document.fullscreenElement) {
+                icon.textContent = '✖'; // Clear Exit Icon
+                toggleBtn.setAttribute('aria-label', 'Exit Fullscreen');
+                GameUtils.log('Entered Fullscreen');
+            } else {
+                icon.textContent = '⛶'; // Restore Expand Icon
+                toggleBtn.setAttribute('aria-label', 'Enter Fullscreen');
+                GameUtils.log('Exited Fullscreen');
+            }
+        });
     }
 
     setupOrientationListeners() {

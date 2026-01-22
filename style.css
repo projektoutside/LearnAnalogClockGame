@@ -42,9 +42,21 @@
     /* Header Bar Height */
     --header-height: 60px;
 
+    /* Safe Area Variables (Notch/Home Bar Support) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+
     /* Transitions */
     --transition-speed: 0.3s;
     --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Ensure padding includes safe areas automatically for body/main containers */
+body {
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
 }
 
 *,
@@ -398,17 +410,20 @@ body {
 
 /* Header Bar Styles - VISIBLE ON ALL PLATFORMS */
 #game-header-bar {
-    display: flex;
     /* Always visible universal header */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--header-height);
+    /* Adapt height to include notch area */
+    height: calc(var(--header-height) + var(--safe-top));
+    padding-top: var(--safe-top);
+    /* Push content down below notch */
     background: rgba(26, 26, 46, 0.95);
     backdrop-filter: blur(10px);
     z-index: 100;
-    padding: 0 var(--spacing-lg);
+    padding-left: calc(var(--spacing-lg) + var(--safe-left));
+    padding-right: calc(var(--spacing-lg) + var(--safe-right));
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     align-items: center;
     justify-content: space-between;
@@ -556,8 +571,11 @@ body {
 
         gap: var(--spacing-sm);
         padding: var(--spacing-sm);
-        /* OPTIMIZED: Just enough to clear header (60px) + spacing, preventing waste */
-        padding-top: calc(var(--header-height) + 20px) !important;
+        padding-bottom: calc(var(--spacing-sm) + var(--safe-bottom));
+        /* Clear home bar */
+
+        /* OPTIMIZED: Header height + Safe Top + Buffer */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 20px) !important;
         height: 100dvh;
         overflow: hidden;
         /* NO SCROLLBARS */
@@ -703,10 +721,13 @@ body {
         align-items: center;
         /* Vertically center everything */
         padding: var(--spacing-sm);
-        padding-top: 70px !important;
-        /* Safety clearance */
-        gap: var(--spacing-md);
-        height: 100vh;
+        /* Safety clearance: Header + Safe Top + Buffer */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 10px) !important;
+        /* Safety clearance for home bar/bottom */
+        padding-bottom: calc(var(--spacing-sm) + var(--safe-bottom));
+        padding-left: calc(var(--spacing-sm) + var(--safe-left));
+        padding-right: calc(var(--spacing-sm) + var(--safe-right));
+
         gap: var(--spacing-md);
         height: 100vh;
         overflow: hidden;
