@@ -1,0 +1,1071 @@
+/* =============================================
+   1. RESET & VARIABLES
+   ============================================= */
+:root {
+    /* Colors - Modern, Vibrant & Accessible */
+    --color-primary: #FF6B6B;
+    --color-secondary: #4ECDC4;
+    --color-accent: #FFE66D;
+
+    --color-text-main: #FFFFFF;
+    --color-text-muted: rgba(255, 255, 255, 0.8);
+    --color-bg-dark: #1A1A2E;
+
+    /* Gradients */
+    --bg-gradient: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+    --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    --card-highlight: rgba(255, 255, 255, 0.2);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --backdrop-blur: 12px;
+
+    /* Spacing & Sizing */
+    /* Spacing & Sizing - Scaled Down slightly */
+    --spacing-xs: 0.2rem;
+    --spacing-sm: 0.4rem;
+    --spacing-md: 0.8rem;
+    --spacing-lg: 1.2rem;
+    --spacing-xl: 1.5rem;
+
+    /* Layout */
+    --clock-size: min(40vh, 40vw);
+    /* Reduced from 45 for better fit */
+
+    /* Global Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-round: 50%;
+    --radius-full: 9999px;
+
+    /* Header Bar Height */
+    --header-height: 60px;
+
+    /* Safe Area Variables (Notch/Home Bar Support) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+
+    /* Transitions */
+    --transition-speed: 0.3s;
+    --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Ensure padding includes safe areas automatically for body/main containers */
+body {
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Prevent scrolling, everything must fit */
+    font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+    color: var(--color-text-main);
+}
+
+body {
+    background: var(--bg-gradient);
+    background-size: 200% 200%;
+    animation: gradientBG 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* =============================================
+   2. UTILITIES & ANIMATIONS
+   ============================================= */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: flex !important;
+}
+
+/* Pulse Animation for Buttons/Important elements */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+    }
+
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* =============================================
+   3. LAYOUT GRID - The Core of Responsiveness
+   ============================================= */
+#game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    margin: 0 auto;
+    /* Main Layout Engine: Grid for horizontal space optimization on wide screens */
+    display: grid;
+    grid-template-columns: minmax(auto, 45vh) 1fr;
+    /* Clock constraint | Content */
+    grid-template-rows: 1fr;
+    align-items: center;
+    /* Vertical Center */
+    justify-content: center;
+    /* Horizontal Center */
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg);
+
+    /* Animation entry */
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+#game-container.visible {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* =============================================
+   3. UNIVERSAL APP LAYOUT
+   ============================================= */
+
+/* Game Container - Main Grid */
+#game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    /* Grid layout for the Content Area (Header is separate) */
+    display: grid;
+    /* Desktop Default: 2 Columns */
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: var(--spacing-lg);
+
+    /* Padding accounts for Fixed Header (60px) + spacing */
+    padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-lg) var(--spacing-lg);
+
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+#game-container.visible {
+    opacity: 1;
+}
+
+#clock-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#game-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center content vertically */
+    gap: var(--spacing-lg);
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    /* Readability constraint */
+    margin: 0 auto;
+}
+
+/* =============================================
+   4. CLOCK STYLES
+   ============================================= */
+.clock-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.clock-container {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    /* Max size on desktop */
+    aspect-ratio: 1/1;
+    /* Keep it square */
+
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+#analog-clock {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Hover effect on clock */
+.clock-container:hover {
+    transform: scale(1.02);
+}
+
+.clock-status {
+    margin-top: var(--spacing-md);
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    min-height: 2em;
+    /* Prevent jump */
+}
+
+.total-score-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--backdrop-blur));
+    border: var(--glass-border);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+}
+
+/* =============================================
+   5. GAME INTERFACE (Right Side)
+   ============================================= */
+/* Progress Panel (Top HUD on right) */
+/* On Desktop, this sits above questions or is part of the grid */
+#progress-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--backdrop-blur));
+    border: var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    box-shadow: var(--glass-shadow);
+
+    /* Ensure it doesn't stretch too tall */
+    max-height: 180px;
+}
+
+.level-row {
+    display: flex;
+    justify-content: center;
+}
+
+.badge {
+    background: var(--color-primary);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-full);
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+#stars,
+#timer,
+#points {
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+#timer {
+    color: var(--color-secondary);
+}
+
+#stars {
+    color: var(--color-accent);
+}
+
+/* Question Panel */
+#question-panel {
+    flex: 1;
+    /* Take remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--spacing-lg);
+}
+
+#question-panel h1 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-sm);
+}
+
+#options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2x2 grid is good for 4 options */
+    gap: var(--spacing-md);
+    width: 100%;
+}
+
+.option {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60px;
+    /* Touch target size */
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.option:hover,
+.option:focus {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.option:active {
+    transform: translateY(0);
+}
+
+/* Header Bar Styles - VISIBLE ON ALL PLATFORMS */
+#game-header-bar {
+    /* Always visible universal header */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Adapt height to include notch area */
+    height: calc(var(--header-height) + var(--safe-top));
+    padding-top: var(--safe-top);
+    /* Push content down below notch */
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    padding-left: calc(var(--spacing-lg) + var(--safe-left));
+    padding-right: calc(var(--spacing-lg) + var(--safe-right));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.header-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-secondary);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header-icon-btn:active {
+    transform: scale(0.9);
+}
+
+.mini-score {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--color-text);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.coin-display-mini {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Shop Overlay Styles */
+#reward-shop-panel.hidden-panel {
+    /* Base state for the container when used as overlay anchor */
+    position: absolute;
+    /* Using absolute within game container context */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through when hidden */
+    z-index: 90;
+}
+
+#shop-items-container.overlay-style {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--header-height));
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(15px);
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns on mobile */
+    gap: var(--spacing-md);
+    align-content: start;
+
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 95;
+    border-bottom: 2px solid var(--color-secondary);
+}
+
+/* Desktop override for overlay: center it or keep it roughly same? */
+/* Keeping it full width top-down is fine for "Meta" overlay style */
+
+#shop-items-container.overlay-style[aria-hidden="false"] {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Shop Items */
+.overlay-style .shop-item {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: none;
+    padding: var(--spacing-md);
+    min-height: 140px;
+    /* Generous touch target */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.overlay-style .item-name {
+    font-size: 1.1rem;
+}
+
+.overlay-style .item-cost {
+    background: rgba(0, 0, 0, 0.4);
+    font-size: 1rem;
+    padding: 4px 12px;
+}
+
+.overlay-style .shop-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.overlay-style .shop-item:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.98);
+}
+
+.insufficient-funds {
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: not-allowed;
+}
+
+/* =============================================
+   6. RESPONSIVE ADAPTATIONS
+   ============================================= */
+
+/* TABLET / MOBILE PORTRAIT (Vertical Layout) */
+@media (max-width: 900px) or (orientation: portrait) {
+    #game-header-bar {
+        padding: 0 var(--spacing-sm);
+    }
+
+    #game-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        /* Ensure clear start from top */
+
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+        padding-bottom: calc(var(--spacing-sm) + var(--safe-bottom));
+        /* Clear home bar */
+
+        /* OPTIMIZED: Header height + Safe Top + Buffer */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 20px) !important;
+        height: 100dvh;
+        overflow: hidden;
+        /* NO SCROLLBARS */
+    }
+
+    /* Compact Clock Panel */
+    #clock-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        padding-bottom: 0;
+        height: auto;
+        margin-top: 5px;
+        /* Reduced nudge */
+    }
+
+    .clock-container {
+        /* Intelligently size clock based on available viewport height for controls */
+        /* Reserve ~60% height for controls/header, rest for clock */
+        max-height: 30vh;
+        /* Reduced from 35vh for extra safety */
+        max-width: 70%;
+        width: auto;
+        margin: 0 auto;
+    }
+
+    .clock-status {
+        margin-top: 0.25rem;
+        font-size: 1.1rem;
+        min-height: 1.2em;
+    }
+
+    /* Compact Game Panel */
+    #game-panel {
+        /* Flex child behavior: Take remaining vertical space */
+        flex: 1 1 auto;
+        min-height: 0;
+        /* Crucial for scrolling to work inside flex item */
+        width: 100%;
+
+        display: flex;
+        /* Internal layout */
+        flex-direction: column;
+
+        gap: var(--spacing-sm);
+        padding: 0;
+        justify-content: center;
+        /* Center vertically if space allows */
+        overflow: hidden;
+        /* NO SCROLLBARS */
+        padding-bottom: 0;
+    }
+
+    #progress-panel {
+        /* Strip style for mobile */
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        padding: 8px;
+        min-height: auto;
+    }
+
+    .stats-grid {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stat-item {
+        flex-direction: row;
+        gap: 6px;
+        align-items: baseline;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        opacity: 0.7;
+    }
+
+    /* Compact Questions - ensure it fits */
+    #question-panel {
+        flex: 0 0 auto;
+        /* Allow natural height in scrollable container */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 0;
+        width: 100%;
+    }
+
+    #question-panel h1 {
+        font-size: 1.2rem;
+        /* Smaller question text */
+        margin-bottom: 0.5rem;
+        margin-top: 5px;
+        text-align: center;
+    }
+
+    #options {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        /* STRICTLY 2x2 */
+        gap: 6px;
+        /* Reduced gap */
+        width: 100%;
+        max-width: 380px;
+        /* Reduced width */
+        margin: 0 auto;
+    }
+
+    .option {
+        height: auto;
+        /* Allow flex sizing */
+        min-height: 50px;
+        /* Reduced from 55px */
+        /* Minimum accessible size */
+        flex: 1;
+        /* Stretch to fill grid cell */
+        aspect-ratio: 2.2/1;
+        /* Slightly flatter */
+        /* Try to maintain boxy shape */
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        /* Reduced font */
+        width: 100%;
+        /* Ensure distinct box look */
+        border-radius: 12px;
+    }
+
+    #reward-shop-panel {
+        height: 0;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/* MOBILE LANDSCAPE (Short height) */
+@media (max-height: 600px) and (orientation: landscape) {
+    #game-container {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        /* Clock Left, Questions Right */
+        grid-template-rows: 1fr;
+        align-items: center;
+        /* Vertically center everything */
+        padding: var(--spacing-sm);
+        /* Safety clearance: Header + Safe Top + Buffer */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 10px) !important;
+        /* Safety clearance for home bar/bottom */
+        padding-bottom: calc(var(--spacing-sm) + var(--safe-bottom));
+        padding-left: calc(var(--spacing-sm) + var(--safe-left));
+        padding-right: calc(var(--spacing-sm) + var(--safe-right));
+
+        gap: var(--spacing-md);
+        height: 100vh;
+        overflow: hidden;
+        /* NO SCROLLBARS */
+    }
+
+    .clock-container {
+        max-width: 55vh;
+        /* Significantly reduced to prevent vertical crowding */
+        margin: 0;
+        /* Auto margin can cause issues in tight grids */
+        justify-self: center;
+    }
+
+    #question-panel h1 {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .stat-label {
+        display: none;
+    }
+
+    /* Hide labels to save space */
+    .badge {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+    }
+
+    #progress-panel {
+        padding: var(--spacing-xs);
+    }
+
+    .stats-grid {
+        display: flex;
+        justify-content: space-around;
+        gap: var(--spacing-md);
+    }
+
+    #options {
+        grid-template-columns: repeat(4, 1fr) !important;
+        /* 4 in a row */
+        gap: var(--spacing-sm);
+        width: 100%;
+    }
+
+    .option {
+        min-height: auto;
+        aspect-ratio: 1/1;
+        /* Force perfect squares */
+        font-size: 1rem;
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* SMALL PHONES PORTRAIT */
+@media (max-width: 480px) and (orientation: portrait) {
+    :root {
+        --spacing-lg: 1rem;
+        --spacing-md: 0.75rem;
+    }
+
+    #game-container {
+        padding: 0.5rem;
+        /* Use calculated safe padding instead of hardcoded 110px, as it's more precise */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 20px) !important;
+        /* MAINTAIN SAFETY PADDING */
+        gap: 0.5rem;
+    }
+
+    .clock-container {
+        max-width: 40vh;
+    }
+
+    #options {
+        grid-template-columns: 1fr 1fr;
+        /* FORCE 2x2 grid even on small screens */
+        gap: 4px;
+        /* Tight gap for small screens */
+    }
+}
+
+/* =============================================
+   7. MODAL STYLES (Glassmorphism)
+   ============================================= */
+/* Overlays */
+.start-menu-overlay,
+.game-over-modal,
+.instructions-modal,
+.settings-modal,
+.level-transition-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    /* Dim background */
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+
+    display: none;
+    /* Controlled by JS via classes */
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-md);
+}
+
+.modal-content,
+.start-menu-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: white;
+}
+
+.game-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    background: linear-gradient(45deg, #FFD166, #FF6B6B);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Unified Buttons */
+button {
+    font-family: inherit;
+    border: none;
+    outline: none;
+}
+
+.primary-btn,
+.start-button,
+.primary-button {
+    background: linear-gradient(45deg, var(--color-primary), #FF8E53);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    margin-top: var(--spacing-md);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.primary-btn:hover,
+.start-button:hover,
+.primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-btn,
+.secondary-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn:hover,
+.secondary-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Difficulty Cards (in Start Menu) */
+.difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin: var(--spacing-lg) 0;
+}
+
+.difficulty-card {
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.difficulty-card input {
+    display: none;
+}
+
+.difficulty-card:hover,
+.difficulty-card:has(input:checked) {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.card-title {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.card-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.card-description {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    display: none;
+    /* Hide description on small cards to save space */
+}
+
+/* =============================================
+   8. SPECIFIC ZONE FIXES
+   ============================================= */
+/* AM/PM Panel */
+#ampm-panel {
+    position: absolute;
+    top: -40px;
+    background: var(--color-dark);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* Points Popup */
+.points-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--color-accent);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+.points-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -80%);
+}
+
+/* Reward Shop Items */
+.shop-items-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    /* Normally hidden unless active? Keeps it clean */
+}
+
+/* Remove scrollbars but allow scroll */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* Ensure Orientation Overlay is hidden */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Game Over Stats */
+.game-over-stats-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.stat-box.main-score {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 30px;
+    border-radius: 20px;
+}
+
+.stat-box .stat-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--color-accent);
+}
