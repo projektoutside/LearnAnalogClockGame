@@ -154,11 +154,17 @@ body {
     height: 100%;
     max-width: 1600px;
     margin: 0 auto;
+    margin: 0 auto;
+    /* Main Layout Engine: Grid for horizontal space optimization on wide screens */
     display: grid;
-    /* Desktop Default: 2 Columns */
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(auto, 45vh) 1fr;
+    /* Clock constraint | Content */
     grid-template-rows: 1fr;
-    gap: var(--spacing-lg);
+    align-items: center;
+    /* Vertical Center */
+    justify-content: center;
+    /* Horizontal Center */
+    gap: var(--spacing-xl);
     padding: var(--spacing-lg);
 
     /* Animation entry */
@@ -217,10 +223,13 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: var(--spacing-md);
+    /* Center content vertically */
+    gap: var(--spacing-lg);
     width: 100%;
     height: 100%;
-    max-height: 100vh;
+    max-width: 600px;
+    /* Readability constraint */
+    margin: 0 auto;
 }
 
 /* =============================================
@@ -783,7 +792,8 @@ body {
 
     #game-container {
         padding: 0.5rem;
-        padding-top: 110px !important;
+        /* Use calculated safe padding instead of hardcoded 110px, as it's more precise */
+        padding-top: calc(var(--header-height) + var(--safe-top) + 20px) !important;
         /* MAINTAIN SAFETY PADDING */
         gap: 0.5rem;
     }
