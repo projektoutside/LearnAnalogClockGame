@@ -768,8 +768,11 @@ class DOMManager {
             modalMenu: document.getElementById('modal-menu'),
 
             // Points popup elements  
-            pointsPopup: document.getElementById('points-popup'),
-            pointsPopupText: document.getElementById('points-popup-text')
+            // Score and Coin popups
+            scorePopup: document.getElementById('score-popup'),
+            scorePopupText: document.getElementById('score-popup-text'),
+            coinPopup: document.getElementById('coin-popup'),
+            coinPopupText: document.getElementById('coin-popup-text')
         };
     }
 
@@ -1023,37 +1026,59 @@ class DOMManager {
     }
 
     showPointsPopup(points, coins = 0) {
-        const popup = this.get('pointsPopup');
-        const popupText = this.get('pointsPopupText');
+        // Show Score Popup
+        const scorePopup = this.get('scorePopup');
+        const scorePopupText = this.get('scorePopupText');
+        const pointsElement = this.get('points'); // Target to position near (stats panel)
 
-        if (popup && popupText) {
-            // Set the points text
-            // Set the points text
-            let text = `+${points}`;
-            if (coins > 0) {
-                text += ` | +${coins} 🪙`;
-            }
-            popupText.textContent = text;
-
-            // Remove any existing animation classes
-            popup.classList.remove('show', 'hidden');
-
-            // Force a reflow to ensure the class removal takes effect
-            popup.offsetHeight;
-
-            // Show the popup with animation
-            popup.classList.add('show');
-
-            // Hide the popup after animation completes
-            setTimeout(() => {
-                popup.classList.remove('show');
-                popup.classList.add('hidden');
-            }, 2000);
-
-            GameUtils.log(`Points popup shown: +${points}`);
-        } else {
-            GameUtils.warn('Points popup elements not found');
+        if (scorePopup && scorePopupText && pointsElement) {
+            scorePopupText.textContent = `+${points}`;
+            scorePopup.classList.remove('hidden'); // Ensure visible for measurement
+            this.positionPopupNearElement(scorePopup, pointsElement);
+            this.animatePopup(scorePopup);
         }
+
+        // Show Coin Popup (if coins earned)
+        if (coins > 0) {
+            const coinPopup = this.get('coinPopup');
+            const coinPopupText = this.get('coinPopupText');
+            // Try desktop coin display first, then mobile
+            const coinElement = document.getElementById('clockcoin-amount') || document.getElementById('mobile-clockcoin-amount');
+
+            if (coinPopup && coinPopupText && coinElement) {
+                // Ensure coin popup text includes the specific amount
+                coinPopupText.textContent = `+${coins} 🪙`;
+                coinPopup.classList.remove('hidden'); // Ensure visible for measurement
+                this.positionPopupNearElement(coinPopup, coinElement);
+
+                // Slight delay for cinematic feel
+                setTimeout(() => {
+                    this.animatePopup(coinPopup);
+                }, 200);
+            }
+        }
+    }
+
+    positionPopupNearElement(popup, targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        // Center the popup on the target element
+        const top = rect.top + (rect.height / 2) - (popup.offsetHeight / 2);
+        const left = rect.left + (rect.width / 2) - (popup.offsetWidth / 2);
+
+        popup.style.top = `${top}px`;
+        popup.style.left = `${left}px`;
+    }
+
+    animatePopup(popup) {
+        popup.classList.remove('show', 'hidden');
+        popup.offsetHeight; // Force reflow
+        popup.classList.add('show');
+
+        setTimeout(() => {
+            popup.classList.remove('show');
+            popup.classList.add('hidden');
+        }, 1500);
+
     }
 
     updateClockStatus(text) {

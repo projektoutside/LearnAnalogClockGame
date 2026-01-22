@@ -270,11 +270,12 @@
                 <!-- Removed total-score-display from here as it is now in header -->
                 <!-- Kept div for structure if needed or hidden -->
 
-                <div id="points-popup" class="points-popup hidden">
-                    <span id="points-popup-text">+10</span>
-                </div>
+                <!-- Removed points-popup from here to move to body for better positioning logic -->
             </div>
         </section>
+
+        <!-- Dynamic Feedback Popups -->
+
 
         <!-- Game Controls -->
         <section id="game-panel">
@@ -402,6 +403,15 @@
 
     <!-- Screen Reader Live Region -->
     <div class="sr-only" aria-live="polite" id="live-region"></div>
+
+
+    <!-- Dynamic Feedback Popups (Moved to body for global positioning) -->
+    <div id="score-popup" class="feedback-popup hidden">
+        <span id="score-popup-text">+10</span>
+    </div>
+    <div id="coin-popup" class="feedback-popup hidden">
+        <span id="coin-popup-text">+1 🪙</span>
+    </div>
 
 </body>
 

@@ -1526,6 +1526,75 @@ button:focus-visible {
 }
 
 /* =============================================
+   13. DYNAMIC FEEDBACK POPUPS
+   ============================================= */
+.feedback-popup {
+    position: fixed;
+    z-index: 2500;
+    /* Highest priority */
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease-out;
+
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    font-weight: 800;
+    font-size: var(--text-lg);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+#score-popup {
+    color: #4CAF50;
+    /* Green for points */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#coin-popup {
+    color: #FFD700;
+    /* Gold for coins */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.feedback-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+    animation: popupFloat 1.5s ease-out forwards;
+}
+
+@keyframes popupFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translateY(0) scale(1.1);
+    }
+
+    30% {
+        transform: translateY(0) scale(1);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+}
+
+/* =============================================
    12. REWARD SHOP OVERLAY (Level Transition)
    ============================================= */
 .reward-shop-overlay {
