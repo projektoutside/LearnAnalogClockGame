@@ -7,13 +7,22 @@
    1. CSS CUSTOM PROPERTIES & DESIGN TOKENS
    ============================================= */
 :root {
-    /* === Color Palette === */
-    --color-primary: #FF6B6B;
-    --color-primary-dark: #E85555;
+    /* === Color Palette - Balanced & Fun === */
+    --color-primary: #7C4DFF;
+    /* Vibrant Purple */
+    --color-primary-dark: #651FFF;
     --color-secondary: #4ECDC4;
+    /* Teal/Mint */
     --color-secondary-dark: #3DBDB5;
     --color-accent: #FFE66D;
+    /* Sunny Yellow */
     --color-accent-dark: #F5D84D;
+    --color-success: #69F0AE;
+    /* Bright Green */
+    --color-warning: #FFB74D;
+    /* Warm Orange */
+    --color-fun: #FF6EB4;
+    /* Playful Pink */
 
     --color-text-main: #FFFFFF;
     --color-text-muted: rgba(255, 255, 255, 0.75);
@@ -23,11 +32,11 @@
     --color-bg-mid: #16213E;
     --color-bg-light: #0F3460;
 
-    /* === Gradients === */
-    --bg-gradient: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+    /* === Gradients - More Colorful & Fun === */
+    --bg-gradient: linear-gradient(135deg, #1A1A2E 0%, #2D1B4E 50%, #0F3460 100%);
     --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
-    --btn-primary-gradient: linear-gradient(135deg, var(--color-primary) 0%, #FF8E53 100%);
-    --btn-secondary-gradient: linear-gradient(135deg, var(--color-secondary) 0%, #45B7AA 100%);
+    --btn-primary-gradient: linear-gradient(135deg, #7C4DFF 0%, #B388FF 100%);
+    --btn-secondary-gradient: linear-gradient(135deg, var(--color-secondary) 0%, #80DEEA 100%);
 
     /* === Glassmorphism === */
     --glass-bg: rgba(255, 255, 255, 0.08);
@@ -185,12 +194,12 @@ body {
     0%,
     100% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.5);
+        box-shadow: 0 0 0 0 rgba(124, 77, 255, 0.5);
     }
 
     50% {
         transform: scale(1.02);
-        box-shadow: 0 0 0 8px rgba(255, 107, 107, 0);
+        box-shadow: 0 0 0 8px rgba(124, 77, 255, 0);
     }
 }
 
@@ -785,7 +794,7 @@ body {
     font-size: var(--text-3xl);
     font-weight: 800;
     margin-bottom: var(--space-xs);
-    background: linear-gradient(135deg, #FFD166 0%, #FF6B6B 100%);
+    background: linear-gradient(135deg, #FFD166 0%, #B388FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -866,7 +875,7 @@ body {
 
 .difficulty-card:hover,
 .difficulty-card:has(input:checked) {
-    background: rgba(255, 107, 107, 0.15);
+    background: rgba(124, 77, 255, 0.2);
     border-color: var(--color-primary);
     transform: translateY(-2px);
 }
@@ -946,7 +955,7 @@ button:focus-visible {
     font-weight: 700;
     color: var(--color-text-main);
 
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.35);
     transition: all var(--transition-fast);
 }
 
@@ -954,7 +963,7 @@ button:focus-visible {
 .start-button:hover,
 .primary-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 8px 25px rgba(124, 77, 255, 0.45);
 }
 
 .primary-btn:active,
