@@ -763,6 +763,9 @@ class DOMManager {
             finalScore: document.getElementById('final-score'),
             finalAccuracy: document.getElementById('final-accuracy'),
             finalQuestions: document.getElementById('final-questions'),
+            gameOverCoins: document.getElementById('game-over-coins'), // New
+            buyTimeBtn: document.getElementById('buy-time-btn'),       // New
+            gameOverFeedback: document.getElementById('game-over-feedback'), // New
             leaderboardList: document.getElementById('leaderboard-list'),
             modalPlayAgain: document.getElementById('modal-play-again'),
             modalMenu: document.getElementById('modal-menu'),
@@ -1213,7 +1216,7 @@ class DOMManager {
     }
 
     // Mobile debug and emergency fallback system
-    showGameOverModal(stats, leaderboard, onPlayAgain, onMenu, onPurchaseTime) {
+    showGameOverModal(stats, leaderboard, currentCoins, onPlayAgain, onMenu, onBuyTime) {
         GameUtils.log('Trying to show Game Over Modal...');
         try {
             const modal = this.get('gameOverModal');
@@ -1252,7 +1255,7 @@ class DOMManager {
             const scoreEl = this.get('finalScore');
             const accuracyEl = this.get('finalAccuracy');
             const questionsEl = this.get('finalQuestions');
-            const coinsEl = document.getElementById('final-coins'); // Get via ID directly if not cached
+            const coinsEl = this.get('gameOverCoins');
 
             GameUtils.log(`Updating stats: Score=${stats.score}, Accuracy=${stats.accuracy}`);
 
@@ -1261,44 +1264,32 @@ class DOMManager {
                 accuracyEl.textContent = (stats.accuracy || 0) + '%';
             }
             if (questionsEl) questionsEl.textContent = stats.questions || 0;
-            if (coinsEl) coinsEl.textContent = (stats.coins || 0) + ' 🪙';
+            if (coinsEl) coinsEl.textContent = currentCoins || 0;
 
-            // Setup Last Chance Shop
-            const buyTimeBtn = document.getElementById('buy-time-btn');
-            const shopFeedback = document.getElementById('shop-feedback');
-            const lastChanceSection = document.getElementById('last-chance-shop');
+            // Setup Buy Time Button
+            const buyTimeBtn = this.get('buyTimeBtn');
+            const feedbackEl = this.get('gameOverFeedback');
+            const TIME_COST = 10; // Cost for 1 minute
 
-            // Only show if user has enough coins (or maybe show disabled?)
-            // Let's show it always but disable if poor
-
-            if (buyTimeBtn && lastChanceSection) {
-                // Check if Time Up or just Lost Life?
-                // User requested "when the timer is up". If stats.score is valid, assume it's game over.
-                // We can check if coins >= 10 to enable button
-                const canAfford = (stats.coins || 0) >= 10;
-                buyTimeBtn.disabled = !canAfford;
-
-                // Clear old listeners
+            if (buyTimeBtn) {
+                // Remove old listeners
                 const newBuyBtn = buyTimeBtn.cloneNode(true);
                 buyTimeBtn.parentNode.replaceChild(newBuyBtn, buyTimeBtn);
+                this.elements.buyTimeBtn = newBuyBtn;
 
-                newBuyBtn.addEventListener('click', () => {
-                    if (onPurchaseTime) {
-                        const success = onPurchaseTime(10);
-                        if (success) {
-                            // Feedback shown by logic or just animate
-                            if (shopFeedback) {
-                                shopFeedback.textContent = 'Time Purchased! Resuming...';
-                                shopFeedback.className = 'shop-feedback success';
-                            }
-                        } else {
-                            if (shopFeedback) {
-                                shopFeedback.textContent = 'Not enough coins!';
-                                shopFeedback.className = 'shop-feedback error';
-                            }
+                // Check affordability
+                if (currentCoins < TIME_COST) {
+                    newBuyBtn.classList.add('disabled');
+                    newBuyBtn.title = "Not enough coins!";
+                } else {
+                    newBuyBtn.classList.remove('disabled');
+                    newBuyBtn.title = "Buy 1 Minute";
+                    newBuyBtn.addEventListener('click', () => {
+                        if (onBuyTime) {
+                            onBuyTime(TIME_COST, feedbackEl);
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // Populate Leaderboard
@@ -1326,12 +1317,12 @@ class DOMManager {
                     const dateDisplay = entry.date || '-';
 
                     item.innerHTML = `
-                    <div style="display: flex; align-items: center;">
-                        <span class="leaderboard-rank rank-${index + 1}">${index + 1}</span>
-                        <span class="leaderboard-date">${dateDisplay}</span>
-                    </div>
-                    <span class="leaderboard-score">${scoreDisplay}</span>
-                `;
+                        <div style="display: flex; align-items: center;">
+                            <span class="leaderboard-rank rank-${index + 1}">${index + 1}</span>
+                            <span class="leaderboard-date">${dateDisplay}</span>
+                        </div>
+                        <span class="leaderboard-score">${scoreDisplay}</span>
+                    `;
                     listEl.appendChild(item);
                 });
             } else {
@@ -1370,7 +1361,7 @@ class DOMManager {
             }
 
         } catch (error) {
-            GameUtils.error('Error showing Game Over modal:', error);
+            GameUtils.error('Error showing Game Over Modal:', error);
             // Fallback: If modal fails, use alert or simple log so user isn't stuck
             alert(`Game Over! Score: ${stats.score}`);
             if (onMenu) onMenu();
@@ -2306,8 +2297,7 @@ class PerfectGameLogic {
 
         while (options.length < 4 && attempts < maxAttempts) {
             const incorrectOption = this.generateEnhancedIncorrectOption(timeData, level, usedOptions);
-            // Ensure result is string and not null/undefined
-            if (incorrectOption && !usedOptions.has(incorrectOption)) {
+            if (!usedOptions.has(incorrectOption)) {
                 options.push(incorrectOption);
                 usedOptions.add(incorrectOption);
                 GameUtils.log(`Generated incorrect option: ${incorrectOption}`);
@@ -2315,46 +2305,23 @@ class PerfectGameLogic {
             attempts++;
         }
 
-        // Safety break for fallback loop
-        let fallbackAttempts = 0;
-        const maxFallback = 50;
-
         // Enhanced fallback generation if needed
-        while (options.length < 4 && fallbackAttempts < maxFallback) {
+        while (options.length < 4) {
             const fallbackOption = this.generateFallbackIncorrectOption(timeData, level, usedOptions);
-            if (fallbackOption && !usedOptions.has(fallbackOption)) {
+            if (!usedOptions.has(fallbackOption)) {
                 options.push(fallbackOption);
                 usedOptions.add(fallbackOption);
             }
-            fallbackAttempts++;
         }
 
         // Ensure we have exactly 4 options
         if (options.length !== 4) {
             GameUtils.warn(`Expected 4 options, got ${options.length}. Padding with fallbacks.`);
-
-            // Safety break for padding loop
-            let paddingAttempts = 0;
-            const maxPadding = 100;
-
-            while (options.length < 4 && paddingAttempts < maxPadding) {
+            while (options.length < 4) {
                 const paddingOption = this.generatePaddingOption(timeData, level, usedOptions);
-                if (paddingOption && !usedOptions.has(paddingOption)) {
+                if (!usedOptions.has(paddingOption)) {
                     options.push(paddingOption);
                     usedOptions.add(paddingOption);
-                }
-                paddingAttempts++;
-            }
-
-            // Emergency final fallback if everything fails (should theoretically never happen now)
-            if (options.length < 4) {
-                GameUtils.error('CRITICAL: Failed to generate 4 unique options! Filling with fallback strings.');
-                const emergencyFillers = ['12:00', '6:00', '3:00', '9:00'];
-                for (const filler of emergencyFillers) {
-                    if (options.length < 4 && !usedOptions.has(filler)) {
-                        options.push(filler);
-                        usedOptions.add(filler);
-                    }
                 }
             }
         }
@@ -2645,7 +2612,7 @@ class PerfectGameLogic {
     }
 
     generatePaddingOption(baseTimeData, level, usedOptions) {
-        // 1. First try random attempts
+        // Last resort: generate any different valid time
         const attempts = 20;
 
         for (let i = 0; i < attempts; i++) {
@@ -2657,37 +2624,18 @@ class PerfectGameLogic {
             };
 
             const formatted = this.formatTime(paddingTime, level);
-            if (formatted && !usedOptions.has(formatted)) {
+            if (!usedOptions.has(formatted)) {
                 return formatted;
             }
         }
 
-        // 2. Systematic search for ANY valid unused time
-        // Iterate hours 1-12
-        for (let h = 1; h <= 12; h++) {
-            // Iterate common minute intervals 0, 15, 30, 45, etc.
-            const commonMinutes = [0, 30, 15, 45, 10, 20, 40, 50, 5, 25, 35, 55];
-            for (let m of commonMinutes) {
-                // Check AM/PM if applicable
-                const amPmStates = level.hasAMPM ? [true, false] : [true];
-
-                for (let isAM of amPmStates) {
-                    const sysTime = {
-                        hours: h,
-                        minutes: m,
-                        seconds: 0,
-                        isAM: isAM
-                    };
-                    const formatted = this.formatTime(sysTime, level);
-                    if (formatted && !usedOptions.has(formatted)) {
-                        return formatted;
-                    }
-                }
-            }
-        }
-
-        // 3. Absolute fallback (this returns null if fails, handled by caller)
-        return null;
+        // Absolute fallback
+        return this.formatTime({
+            hours: 6,
+            minutes: 0,
+            seconds: 0,
+            isAM: true
+        }, level);
     }
 
     enhancedShuffle(array, randomnessManager) {
@@ -3072,29 +3020,20 @@ class PerfectGameLogic {
         const stats = {
             score: this.gameState.points,
             accuracy: accuracy,
-            questions: this.gameState.questionsAnswered,
-            coins: this.rewardShop ? this.rewardShop.getClockCoins() : 0
+            questions: this.gameState.questionsAnswered
         };
 
         const leaderboard = this.highScoreManager ? this.highScoreManager.getLeaderboard() : [];
+        const currentCoins = this.rewardShop ? this.rewardShop.getClockCoins() : 0;
 
         // Show Game Over Modal (replacing inline options)
         this.domManager.showGameOverModal(
             stats,
             leaderboard,
+            currentCoins,
             () => this.restartGame(),     // Play Again Callback
-            () => this.returnToMenu(),    // Menu Callback
-            // On Purchase Time Callback
-            (cost) => {
-                if (this.rewardShop && this.rewardShop.getClockCoins() >= cost) {
-                    this.rewardShop.clockCoins -= cost;
-                    this.rewardShop.updateClockCoinDisplay();
-                    this.gameState.addTime(60); // Add 60 seconds
-                    this.resumeGameFromGameOver();
-                    return true; // Success
-                }
-                return false; // Failed
-            }
+            () => this.returnToMenu(),     // Menu Callback
+            (cost, feedbackEl) => this.handleBuyTime(cost, feedbackEl) // Buy Time Callback
         );
 
         // Update status for background context (optional)
@@ -3105,19 +3044,37 @@ class PerfectGameLogic {
         GameUtils.log(`🎮 Game Over - Score: ${this.gameState.points}, Accuracy: ${accuracy}%`);
     }
 
-    resumeGameFromGameOver() {
-        GameUtils.log('Resuming game from Last Chance shop purchase...');
+    handleBuyTime(cost, feedbackEl) {
+        if (!this.rewardShop || this.rewardShop.getClockCoins() < cost) {
+            if (feedbackEl) {
+                feedbackEl.textContent = "Not enough coins!";
+                feedbackEl.className = "feedback-message error visible";
+                setTimeout(() => feedbackEl.classList.add('hidden'), 2000);
+            }
+            return;
+        }
+
+        // Process purchase
+        this.rewardShop.clockCoins -= cost;
+        this.rewardShop.updateClockCoinDisplay();
+        
+        // Add time and resume
+        const SECONDS_TO_ADD = 60;
+        this.gameState.addTime(SECONDS_TO_ADD);
         this.gameState.isGameActive = true;
-
-        // Hide modal
-        const modal = this.domManager.get('gameOverModal');
-        if (modal) modal.classList.add('hidden');
-
-        // Resume global timer (don't reset)
         this.resumeTimer();
+        
+        // Hide modal
+        this.domManager.safeUpdate('gameOverModal', el => {
+            el.classList.add('hidden');
+            el.style.display = ''; 
+        });
 
-        this.domManager.updateClockStatus('Game Resumed! +1 Minute Added ⏰');
+        // Show feedback
+        GameUtils.log(`✅ Resumed game with +${SECONDS_TO_ADD}s for ${cost} coins`);
+        this.domManager.updateClockStatus("Time Extended! Go! 🚀");
     }
+
     restartGame() {
         // Restart immediately with the same initial level
         GameUtils.log(`Restarting game at level ${this.initialLevel}...`);
