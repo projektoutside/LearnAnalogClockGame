@@ -4638,7 +4638,7 @@ function initializeGame() {
                         gameContainer.style.top = '0';
                         gameContainer.style.left = '0';
                         gameContainer.style.zIndex = '1000';
-                        gameContainer.style.background = '#f5576c';
+                        gameContainer.style.background = 'transparent';
                         gameContainer.style.overflow = 'hidden';
 
                         GameUtils.log('MOBILE: Applied aggressive game container styling');
@@ -4650,8 +4650,8 @@ function initializeGame() {
                         optionsContainer.style.width = '100%';
                         optionsContainer.style.padding = '10px';
                         optionsContainer.style.margin = '10px 0';
-                        optionsContainer.style.background = 'rgba(255, 0, 0, 0.1)';
-                        optionsContainer.style.border = '2px solid #ff0000';
+                        optionsContainer.style.background = 'transparent';
+                        optionsContainer.style.border = 'none';
                         optionsContainer.style.boxSizing = 'border-box';
                         optionsContainer.style.overflow = 'visible';
                         optionsContainer.style.position = 'relative';

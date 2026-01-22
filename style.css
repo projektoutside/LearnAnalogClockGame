@@ -541,6 +541,7 @@ body {
     margin: 0 auto;
 }
 
+/* Base option styling - elegant glassmorphism with unified teal color */
 .option {
     display: flex;
     align-items: center;
@@ -548,39 +549,37 @@ body {
     min-height: 48px;
     padding: var(--space-sm) var(--space-md);
     aspect-ratio: 2 / 1;
-
-    /* Cool Teal/Cyan theme to balance the Red minute hand */
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), rgba(78, 205, 196, 0.05));
-    border: 2px solid rgba(78, 205, 196, 0.4);
     border-radius: var(--radius-md);
-
     font-size: var(--text-lg);
     font-weight: 700;
-    color: #E0F2F1;
-    /* Very light teal/white */
+    color: #FFFFFF;
     text-align: center;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;
     transition: all var(--transition-fast);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    /* Elegant teal/mint - complements the dark blue-purple background */
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(64, 224, 208, 0.1));
+    border: 2px solid rgba(78, 205, 196, 0.5);
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.15);
 }
 
 .option:hover,
 .option:focus {
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.35), rgba(78, 205, 196, 0.15));
-    border-color: var(--color-secondary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(78, 205, 196, 0.3);
-    color: #FFFFFF;
-    text-shadow: 0 0 8px rgba(78, 205, 196, 0.6);
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.4), rgba(64, 224, 208, 0.25));
+    border-color: #4ECDC4;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
 }
 
+/* Active state for all options */
 .option:active {
-    transform: translateY(0) scale(0.98);
-    background: rgba(78, 205, 196, 0.1);
+    transform: translateY(0) scale(0.97);
+    background: rgba(78, 205, 196, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
