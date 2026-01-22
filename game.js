@@ -1022,13 +1022,18 @@ class DOMManager {
         this.safeUpdate('totalScoreDisplay', el => el.textContent = points.toString());
     }
 
-    showPointsPopup(points) {
+    showPointsPopup(points, coins = 0) {
         const popup = this.get('pointsPopup');
         const popupText = this.get('pointsPopupText');
 
         if (popup && popupText) {
             // Set the points text
-            popupText.textContent = `+${points}`;
+            // Set the points text
+            let text = `+${points}`;
+            if (coins > 0) {
+                text += ` | +${coins} 🪙`;
+            }
+            popupText.textContent = text;
 
             // Remove any existing animation classes
             popup.classList.remove('show', 'hidden');
@@ -2704,8 +2709,8 @@ class PerfectGameLogic {
             this.rewardShop.earnClockCoin();
         }
 
-        // Show points popup with the points earned
-        this.domManager.showPointsPopup(pointsEarned);
+        // Show points popup with the points earned and 1 coin
+        this.domManager.showPointsPopup(pointsEarned, 1);
 
         let feedbackDuration = 1500;
         let showLevelTransition = false;
@@ -3874,7 +3879,8 @@ class RewardShop {
         this.clockCoins++;
         this.updateClockCoinDisplay();
         this.updateShopAvailability();
-        this.showCoinEarnedFeedback();
+        // Feedback is handled by showPointsPopup in handleCorrectAnswer to avoid duplicates
+        // this.showCoinEarnedFeedback();
         GameUtils.log(`💰 Earned 1 ClockCoin! Total: ${this.clockCoins}`);
     }
 
