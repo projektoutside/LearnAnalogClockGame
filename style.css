@@ -549,30 +549,39 @@ body {
     padding: var(--space-sm) var(--space-md);
     aspect-ratio: 2 / 1;
 
-    background: var(--glass-bg);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    /* Cool Teal/Cyan theme to balance the Red minute hand */
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), rgba(78, 205, 196, 0.05));
+    border: 2px solid rgba(78, 205, 196, 0.4);
     border-radius: var(--radius-md);
 
     font-size: var(--text-lg);
     font-weight: 700;
-    color: var(--color-text-main);
+    color: #E0F2F1;
+    /* Very light teal/white */
     text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 
     cursor: pointer;
     user-select: none;
     touch-action: manipulation;
     transition: all var(--transition-fast);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .option:hover,
 .option:focus {
-    background: var(--glass-bg-hover);
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.35), rgba(78, 205, 196, 0.15));
+    border-color: var(--color-secondary);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 24px rgba(78, 205, 196, 0.3);
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(78, 205, 196, 0.6);
 }
 
 .option:active {
     transform: translateY(0) scale(0.98);
+    background: rgba(78, 205, 196, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* =============================================
