@@ -2306,7 +2306,8 @@ class PerfectGameLogic {
 
         while (options.length < 4 && attempts < maxAttempts) {
             const incorrectOption = this.generateEnhancedIncorrectOption(timeData, level, usedOptions);
-            if (!usedOptions.has(incorrectOption)) {
+            // Ensure result is string and not null/undefined
+            if (incorrectOption && !usedOptions.has(incorrectOption)) {
                 options.push(incorrectOption);
                 usedOptions.add(incorrectOption);
                 GameUtils.log(`Generated incorrect option: ${incorrectOption}`);
@@ -2314,23 +2315,46 @@ class PerfectGameLogic {
             attempts++;
         }
 
+        // Safety break for fallback loop
+        let fallbackAttempts = 0;
+        const maxFallback = 50;
+
         // Enhanced fallback generation if needed
-        while (options.length < 4) {
+        while (options.length < 4 && fallbackAttempts < maxFallback) {
             const fallbackOption = this.generateFallbackIncorrectOption(timeData, level, usedOptions);
-            if (!usedOptions.has(fallbackOption)) {
+            if (fallbackOption && !usedOptions.has(fallbackOption)) {
                 options.push(fallbackOption);
                 usedOptions.add(fallbackOption);
             }
+            fallbackAttempts++;
         }
 
         // Ensure we have exactly 4 options
         if (options.length !== 4) {
             GameUtils.warn(`Expected 4 options, got ${options.length}. Padding with fallbacks.`);
-            while (options.length < 4) {
+
+            // Safety break for padding loop
+            let paddingAttempts = 0;
+            const maxPadding = 100;
+
+            while (options.length < 4 && paddingAttempts < maxPadding) {
                 const paddingOption = this.generatePaddingOption(timeData, level, usedOptions);
-                if (!usedOptions.has(paddingOption)) {
+                if (paddingOption && !usedOptions.has(paddingOption)) {
                     options.push(paddingOption);
                     usedOptions.add(paddingOption);
+                }
+                paddingAttempts++;
+            }
+
+            // Emergency final fallback if everything fails (should theoretically never happen now)
+            if (options.length < 4) {
+                GameUtils.error('CRITICAL: Failed to generate 4 unique options! Filling with fallback strings.');
+                const emergencyFillers = ['12:00', '6:00', '3:00', '9:00'];
+                for (const filler of emergencyFillers) {
+                    if (options.length < 4 && !usedOptions.has(filler)) {
+                        options.push(filler);
+                        usedOptions.add(filler);
+                    }
                 }
             }
         }
@@ -2621,7 +2645,7 @@ class PerfectGameLogic {
     }
 
     generatePaddingOption(baseTimeData, level, usedOptions) {
-        // Last resort: generate any different valid time
+        // 1. First try random attempts
         const attempts = 20;
 
         for (let i = 0; i < attempts; i++) {
@@ -2633,18 +2657,37 @@ class PerfectGameLogic {
             };
 
             const formatted = this.formatTime(paddingTime, level);
-            if (!usedOptions.has(formatted)) {
+            if (formatted && !usedOptions.has(formatted)) {
                 return formatted;
             }
         }
 
-        // Absolute fallback
-        return this.formatTime({
-            hours: 6,
-            minutes: 0,
-            seconds: 0,
-            isAM: true
-        }, level);
+        // 2. Systematic search for ANY valid unused time
+        // Iterate hours 1-12
+        for (let h = 1; h <= 12; h++) {
+            // Iterate common minute intervals 0, 15, 30, 45, etc.
+            const commonMinutes = [0, 30, 15, 45, 10, 20, 40, 50, 5, 25, 35, 55];
+            for (let m of commonMinutes) {
+                // Check AM/PM if applicable
+                const amPmStates = level.hasAMPM ? [true, false] : [true];
+
+                for (let isAM of amPmStates) {
+                    const sysTime = {
+                        hours: h,
+                        minutes: m,
+                        seconds: 0,
+                        isAM: isAM
+                    };
+                    const formatted = this.formatTime(sysTime, level);
+                    if (formatted && !usedOptions.has(formatted)) {
+                        return formatted;
+                    }
+                }
+            }
+        }
+
+        // 3. Absolute fallback (this returns null if fails, handled by caller)
+        return null;
     }
 
     enhancedShuffle(array, randomnessManager) {
